@@ -135,40 +135,6 @@ let router = (routes: array<route>) => (request: message) => {
   }
 }
 
-module DreamExpress = {
-  external transformRequest: Express.req => request = "%identity"
-  external transformStatus: Status.t => int = "%identity"
-
-  @send external append: (Express.res, string, string) => Express.res = "append"
-
-  let run = (port, handler: handler) => {
-    let app = Express.express()
-
-    app->Express.use((req, res, next) => {
-      let _ = handler(req->transformRequest)->Promise.thenResolve(response => {
-        let _ = switch response.status {
-        | Some(status) => res->Express.status(status->transformStatus)
-        | None => res
-        }
-        let _ = switch response.body {
-        | Some(body) => res->Express.send(body)
-        | None => res
-        }
-
-        let _ = switch response.json {
-        | Some(json) => res->Express.json(json)
-        | None => res
-        }
-        next()
-      })
-    })
-
-    app->Express.listenWithCallback(port, _ => {
-      Js.Console.log(`Listening on http://localhost:${port->Belt.Int.toString}`)
-    })
-  }
-}
-
 external toJson: {..} => JSON.t = "%identity"
 
 let json = t => {json: t->toJson, status: Ok}

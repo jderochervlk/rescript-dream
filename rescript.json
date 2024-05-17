@@ -1,9 +1,16 @@
 {
   "name": "rescript-server",
-  "sources": {
-    "dir": "src",
-    "subdirs": true
-  },
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "examples",
+      "subdirs": true,
+      "type": "dev"
+    }
+  ],
   "package-specs": {
     "module": "esmodule",
     "in-source": true
@@ -12,7 +19,9 @@
   "bs-dependencies": [
     "@rescript/core",
     "rescript-express",
-    "rescript-webapi",
+    "rescript-webapi"
+  ],
+  "bs-dev-dependencies": [
     "@jvlk/rescript-lite-jsx"
   ],
   "bsc-flags": [
