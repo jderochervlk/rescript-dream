@@ -1,23 +1,4 @@
-# ReScript Project Template
+# @jvlk/rescript-dream
+A functional ReScript server framework for Javascript runtimes.
 
-- [Installation](../../README.md)
-
-Official ReScript starter template.
-
-## Installation
-
-```sh
-npm install
-```
-
-## Build
-
-- Build: `npm run res:build`
-- Clean: `npm run res:clean`
-- Build & watch: `npm run res:dev`
-
-## Run
-
-```sh
-node src/Demo.res.js
-```
+Inspired and heavily based on [Dream for OCaml](https://aantron.github.io/dream/).
