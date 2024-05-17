@@ -36,19 +36,11 @@ let app = Express.express()
 
 let router = Dream.router([
   Dream.get("/", _ => {
-    Promise.resolve(
-      Dream.response({
-        status: 200,
-      }),
-    )
+    Promise.resolve(Dream.json({"foo": "bar"}))
     // Promise.resolve(Response.make(`{"Hello": "world"}`))
   }),
   Dream.get("/foo", _ => {
-    Promise.resolve(
-      Dream.response({
-        status: 200,
-      }),
-    )
+    Promise.resolve(Dream.html(<pre> {Lite.string("Hello!")} </pre>))
   }),
 ])
 

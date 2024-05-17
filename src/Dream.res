@@ -1,10 +1,8 @@
 type client
 type server
 
-type message<'a>
-
 // https://aantron.github.io/dream/#methods
-type method_ =
+type method =
   | GET
   | POST
   | PUT
@@ -31,7 +29,9 @@ module Status = {
     | @as(208) AlreadyReported
     | @as(226) IMUsed
 
-  external set: successful => successful = "%identity"
+  type t = successful
+
+  external set: t => t = "%identity"
 }
 
 let t1 = Status.set(Created)
@@ -39,9 +39,20 @@ let t1 = Status.set(Created)
 type header = (string, string)
 type headers = array<header>
 
-type request = Webapi.Fetch.Request.t
+// type request = Webapi.Fetch.Request.t
 
-type response = {headers?: headers, status?: int, statusText?: string}
+type message = {
+  headers?: headers,
+  status?: int,
+  statusText?: string,
+  url?: string,
+  method?: method,
+  json?: JSON.t,
+  body?: string,
+}
+
+type response = message
+type request = message
 
 type handler = request => promise<response>
 
@@ -62,11 +73,14 @@ let logger: middleware = handler => {
   }
 }
 
-let router = (routes: array<route>) => request => {
-  let requestMethod = request->Webapi.Fetch.Request.method_
-  let requestPath = request->Webapi.Fetch.Request.url
-  switch requestMethod {
-  | Get =>
+let router = (routes: array<route>) => (request: message) => {
+  let requestMethod = request.method
+  let requestPath = request.url
+
+  Console.log(requestPath)
+
+  switch (requestMethod, requestPath) {
+  | (Some(GET), Some(requestPath)) =>
     switch routes->Array.find(route =>
       switch route {
       | Get(path, _) => path === requestPath
@@ -88,8 +102,22 @@ module DreamExpress = {
 
     app->Express.use((req, res, next) => {
       let _ = handler(req->transformRequest)->Promise.thenResolve(response => {
-        let headers = response.headers
-        let _ = res->Express.append("", "")
+        let _ = switch response.status {
+        | Some(status) => res->Express.status(status)
+        | None => res
+        }
+        let _ = switch response.body {
+        | Some(body) => res->Express.send(body)
+        | None => res
+        }
+
+        let _ = switch response.json {
+        | Some(json) => res->Express.json(json)
+        | None => res
+        }
+
+        // let _headers = response.headers
+        // let _ = res->Express.append("", "")
         next()
       })
     })
@@ -99,3 +127,11 @@ module DreamExpress = {
     })
   }
 }
+
+external toJson: {..} => JSON.t = "%identity"
+
+let json = t => {json: t->toJson, status: 200}
+
+external jsxToBody: Jsx.element => string = "%identity"
+
+let html = e => {body: e->jsxToBody, status: 200}
