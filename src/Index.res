@@ -36,11 +36,21 @@ let app = Express.express()
 
 let router = Dream.router([
   Dream.get("/", _ => {
-    Promise.resolve(Dream.json({"foo": "bar"}))
+    Promise.resolve(
+      Dream.html(
+        <html>
+          <head>
+            <script src="https://unpkg.com/htmx.org@1.9.12" />
+          </head>
+          <button hxGet="/data" hxTarget="#data"> {Lite.string("Get data")} </button>
+          <div id="data" />
+        </html>,
+      ),
+    )
     // Promise.resolve(Response.make(`{"Hello": "world"}`))
   }),
-  Dream.get("/foo", _ => {
-    Promise.resolve(Dream.html(<pre> {Lite.string("Hello!")} </pre>))
+  Dream.get("/data", _ => {
+    Promise.resolve(Dream.html(<div> {"Data!"->Lite.string} </div>))
   }),
 ])
 

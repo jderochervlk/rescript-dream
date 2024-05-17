@@ -14,7 +14,7 @@ function get(path, handler) {
 
 function logger(handler) {
   return function (request) {
-    console.log("Request received:", "f");
+    console.log("Request received:", request.method);
     return handler(request);
   };
 }
@@ -77,18 +77,16 @@ function json(t) {
         };
 }
 
-function html(e) {
+function html(e, statusOpt) {
+  var status = statusOpt !== undefined ? statusOpt : 200;
   return {
-          status: 200,
+          status: status,
           body: e
         };
 }
 
-var t1 = 201;
-
 export {
   Status ,
-  t1 ,
   get ,
   logger ,
   router ,

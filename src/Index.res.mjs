@@ -8,14 +8,28 @@ var app = Express();
 
 var router = Dream.router([
       Dream.get("/", (function (param) {
-              return Promise.resolve(Dream.json({
-                              foo: "bar"
-                            }));
+              return Promise.resolve(Dream.html(Lite.Elements.jsxs("html", {
+                                  children: [
+                                    Lite.Elements.jsx("head", {
+                                          children: Lite.Elements.jsx("script", {
+                                                src: "https://unpkg.com/htmx.org@1.9.12"
+                                              })
+                                        }),
+                                    Lite.Elements.jsx("button", {
+                                          children: "Get data",
+                                          "hx-get": "/data",
+                                          "hx-target": "#data"
+                                        }),
+                                    Lite.Elements.jsx("div", {
+                                          id: "data"
+                                        })
+                                  ]
+                                }), undefined));
             })),
-      Dream.get("/foo", (function (param) {
-              return Promise.resolve(Dream.html(Lite.Elements.jsx("pre", {
-                                  children: "Hello!"
-                                })));
+      Dream.get("/data", (function (param) {
+              return Promise.resolve(Dream.html(Lite.Elements.jsx("div", {
+                                  children: "Data!"
+                                }), undefined));
             }))
     ]);
 
