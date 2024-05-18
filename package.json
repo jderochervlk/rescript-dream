@@ -16,6 +16,8 @@
     "@jvlk/rescript-lite-jsx": "^1.1.0",
     "@rescript/core": "1.2.0",
     "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "path-to-regexp": "^6.2.2",
     "rescript": "^11.1.0",
     "rescript-bun": "^0.4.1",
     "rescript-express": "^0.4.1",

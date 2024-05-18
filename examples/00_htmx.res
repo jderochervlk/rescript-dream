@@ -15,4 +15,6 @@ let router = Dream.router([
   }),
 ])
 
-let _ = DreamExpress.run(router->Dream.logger)
+let logger = Dream.logger("tiny")
+
+let _ = DreamExpress.run(router->logger)

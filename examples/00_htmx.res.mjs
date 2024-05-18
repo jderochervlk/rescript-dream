@@ -31,9 +31,12 @@ var router = Dream.router([
             }))
     ]);
 
-DreamExpress.run(undefined, Dream.logger(router));
+var logger = Dream.logger("tiny");
+
+DreamExpress.run(undefined, logger(router));
 
 export {
   router ,
+  logger ,
 }
 /* router Not a pure module */
