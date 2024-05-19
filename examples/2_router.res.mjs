@@ -4,21 +4,17 @@ import * as Dream from "../src/Dream.res.mjs";
 import * as DreamExpress from "../src/DreamExpress.res.mjs";
 
 DreamExpress.run(undefined, Dream.router([
-          Dream.get("/", (async function (param) {
+          Dream.get("/", (async function (param, paramsOpt) {
                   return Dream.html("Good morning, world!", undefined);
                 })),
-          Dream.get("/echo/:word", (async function (param) {
-                  return Dream.html("Good morning, world!", undefined);
+          Dream.get("/echo/:word", (async function (param, paramsOpt) {
+                  var params = paramsOpt !== undefined ? paramsOpt : [];
+                  var name = params[0];
+                  return Dream.html(name, undefined);
                 }))
         ]));
 
-function filterEmptyStrings(arr) {
-  return arr.filter(function (s) {
-              return s !== "";
-            });
-}
-
 export {
-  filterEmptyStrings ,
+  
 }
 /*  Not a pure module */

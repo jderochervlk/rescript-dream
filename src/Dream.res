@@ -115,34 +115,38 @@ module Request = {
   let url = Request.url
 }
 
-type handler = Request.t => promise<Response.t>
+type handler = (Request.t, ~params: array<string>=?) => promise<Response.t>
 
 type middleware = handler => handler
 
-type path = string
+type path = Route.t
 
 type route = Get(path, handler)
 
-let get = (path, handler) => Get(path, handler)
+let get = (path, handler) => Get(path->Route.make, handler)
 
-let router = (routes: array<route>) => (request: Request.t) => {
+let router = (routes: array<route>) => (request: Request.t, ~params: option<array<string>>=?) => {
   let requestMethod = request->Request.method
   let requestPath = request->Request.url
 
-  // Console.log(requestPath)
+  let _ = params // just to hide the warning
 
   switch (requestMethod, requestPath) {
   | (Get, requestPath) =>
     switch routes->Array.find(route =>
       switch route {
-      | Get(path, _) => path === requestPath
+      | Get(path, _) => path(requestPath)->Option.isSome
       }
     ) {
-    | Some(Get(_, handler)) => handler(request)
+    | Some(Get(path, handler)) => {
+        let params = path(requestPath)->Option.getOr([])
+        handler(request, ~params)
+      }
     | None => Promise.resolve(Response.make({status: NotFound}))
     }
   | _ => Promise.resolve(Response.make({status: NotFound}))
   }
+  // Promise.resolve(Response.make({status: NotFound}))
 }
 
 external toJson: {..} => JSON.t = "%identity"
@@ -157,15 +161,15 @@ module Morgan = {
   external make: string => logger = "default"
 }
 
-let logger: string => middleware = string => {
-  let log = Morgan.make(string)
-  handler => {
-    request => {
-      let response = handler(request)
-      response->Promise.then(res => {
-        let _ = log(request, res, () => ()) // TODO: I am guessing this doesn't work since I am not using a real request object
-        Promise.resolve(res)
-      })
-    }
-  }
-}
+// let logger: string => middleware = string => {
+//   let log = Morgan.make(string)
+//   handler => {
+//     (request, ~params) => {
+//       let response = handler(request, ~params)
+//       response->Promise.then(res => {
+//         let _ = log(request, res, () => ()) // TODO: I am guessing this doesn't work since I am not using a real request object
+//         Promise.resolve(res)
+//       })
+//     }
+//   }
+// }

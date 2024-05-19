@@ -1,10 +1,12 @@
-type t
+type re
 
 @module("path-to-regexp")
-external pathToRegexp: string => t = "pathToRegexp"
+external pathToRegexp: string => re = "pathToRegexp"
 
 @send
-external exec: (t, string) => nullable<array<string>> = "exec"
+external exec: (re, string) => nullable<array<string>> = "exec"
+
+type t = string => option<array<string>>
 
 let make = s => {
   let r = s->pathToRegexp

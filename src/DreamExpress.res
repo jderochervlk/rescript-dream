@@ -10,7 +10,7 @@ let run = (~port=8080, handler: Dream.handler) => {
   app->Express.use((req, res, next) => {
     let _ = handler(req->transformRequest)->Promise.thenResolve(response => {
       let body = response.body
-      let _ = Console.log(response.body)
+      // let _ = Console.log2("--", req->Express.originalUrl)
       let _ =
         res
         ->Express.status(response->Dream.Response.status)
