@@ -19,13 +19,16 @@
   "bs-dependencies": [
     "@rescript/core",
     "rescript-express",
-    "rescript-webapi"
+    "rescript-webapi",
+    "rescript-bun"
   ],
   "bs-dev-dependencies": [
     "@jvlk/rescript-lite-jsx"
   ],
   "bsc-flags": [
-    "-open RescriptCore"
+    "-open RescriptCore",
+    "-open RescriptBun",
+    "-open RescriptBun.Globals"
   ],
   "jsx": {
     "version": 4,
