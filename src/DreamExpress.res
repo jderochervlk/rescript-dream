@@ -7,7 +7,7 @@ external transformRequest: Express.req => Dream.Request.t = "%identity"
 
 let run = (~port=8080, handler: Dream.handler) => {
   let app = Express.express()
-
+  app->Express.use(Express.jsonMiddleware())
   app->Express.use((req, res, next) => {
     let _ =
       handler(req->transformRequest)
@@ -16,8 +16,9 @@ let run = (~port=8080, handler: Dream.handler) => {
         let _ =
           res
           ->Express.status(response->Dream.Response.status)
-          ->Express.send(body)
           ->setHeaders(response.headers->Dream.headersToObject)
+          ->Express.send(body)
+
         next()
       })
       ->Promise.catch(err => {

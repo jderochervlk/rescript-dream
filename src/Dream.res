@@ -117,6 +117,7 @@ module Request = {
     url: string,
     /* params from the url, i.e. /path/:id becomes [ id ] */
     urlParams: option<{.}>,
+    body: unknown,
   }
 
   let param = (t: option<{.}>, param) => {
@@ -130,9 +131,12 @@ type middleware = handler => handler
 
 type path = Route.t
 
-type route = Get(path, handler)
+type route = Route(path, method, handler)
+// | Get(path, handler)
+// | Post(path, handler)
 
-let get = (path, handler) => Get(path->Route.make, handler)
+let get = (path, handler) => Route(path->Route.make, GET, handler)
+let post = (path, handler) => Route(path->Route.make, POST, handler)
 
 let router = (routes: array<route>) => (request: Request.t) => {
   let requestMethod = request.method
@@ -142,10 +146,24 @@ let router = (routes: array<route>) => (request: Request.t) => {
   | (GET, requestPath) =>
     switch routes->Array.find(route =>
       switch route {
-      | Get(path, _) => path(requestPath)->Option.isSome
+      | Route(path, GET, _) => path(requestPath)->Option.isSome
+      | _ => false
       }
     ) {
-    | Some(Get(path, handler)) => {
+    | Some(Route(path, _, handler)) => {
+        let params = path(requestPath)
+        handler({...request, urlParams: params})
+      }
+    | None => Promise.resolve(Response.make({status: NotFound}))
+    }
+  | (POST, requestPath) =>
+    switch routes->Array.find(route =>
+      switch route {
+      | Route(path, POST, _) => path(requestPath)->Option.isSome
+      | _ => false
+      }
+    ) {
+    | Some(Route(path, _, handler)) => {
         let params = path(requestPath)
         handler({...request, urlParams: params})
       }
@@ -155,9 +173,12 @@ let router = (routes: array<route>) => (request: Request.t) => {
   }
 }
 
-external toJson: {..} => JSON.t = "%identity"
-
-let json = t => Response.make({json: t->toJson, status: Ok})
+let json = (t: 'a) =>
+  Response.make({
+    body: t->JSON.stringifyAny->Option.getOr(""),
+    status: Ok,
+    headers: [("Content-Type", "application/octet-stream")],
+  })
 
 let html = (e, ~status=Ok) => Response.make({body: e->Response.body, status})
 
