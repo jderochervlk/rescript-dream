@@ -5,7 +5,8 @@ let run = (~port=8080, handler: Dream.handler) => {
   let server = Bun.serve({
     port,
     fetch: async (request, _server) => {
-      let response = await handler(request->transformRequest)
+      let url = request->Request.url->URL.make->URL.pathname
+      let response = await handler({...request->transformRequest, url})
       let headers = HeadersInit.FromArray(response.headers->Option.getOr([]))
 
       Response.make(

@@ -180,7 +180,8 @@ let json = (t: 'a) =>
     headers: [("Content-Type", "application/json")],
   })
 
-let html = (e, ~status=Ok) => Response.make({body: e->Response.body, status})
+let html = (e, ~status=Ok) =>
+  Response.make({body: e->Response.body, status, headers: [("Content-Type", "Text/HTML")]})
 
 let sendStatus = status => Response.make({body: "", status})
 
