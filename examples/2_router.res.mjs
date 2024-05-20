@@ -5,10 +5,10 @@ import * as DreamExpress from "../src/DreamExpress.res.mjs";
 
 DreamExpress.run(undefined, Dream.router([
           Dream.get("/", (async function (param) {
-                  return Dream.html("Good morning, world!", undefined);
+                  return Dream.html("Good morning, world?", undefined);
                 })),
           Dream.get("/echo/:word", (async function (param) {
-                  var name = param.urlParams[0];
+                  var name = Dream.$$Request.param(param.urlParams, "word");
                   return Dream.html(name, undefined);
                 }))
         ]));

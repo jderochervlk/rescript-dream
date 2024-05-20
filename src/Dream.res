@@ -114,7 +114,11 @@ module Request = {
     method: method,
     url: string,
     /* params from the url, i.e. /path/:id becomes [ id ] */
-    urlParams: array<string>,
+    urlParams: option<{.}>,
+  }
+
+  let param = (t: option<{.}>, param) => {
+    t->Option.flatMap(t => t->Object.get(param))
   }
 }
 
@@ -140,7 +144,7 @@ let router = (routes: array<route>) => (request: Request.t) => {
       }
     ) {
     | Some(Get(path, handler)) => {
-        let params = path(requestPath)->Option.getOr([])
+        let params = path(requestPath)
         handler({...request, urlParams: params})
       }
     | None => Promise.resolve(Response.make({status: NotFound}))

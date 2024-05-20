@@ -21,7 +21,15 @@ var $$Response = {
   status: status
 };
 
-var $$Request = {};
+function param(t, param$1) {
+  return Core__Option.flatMap(t, (function (t) {
+                return t[param$1];
+              }));
+}
+
+var $$Request = {
+  param: param
+};
 
 function get(path, handler) {
   return {
@@ -48,7 +56,7 @@ function router(routes) {
                   status: 404
                 });
     }
-    var params = Core__Option.getOr(match._0(requestPath), []);
+    var params = match._0(requestPath);
     return match._1({
                 method: request.method,
                 url: request.url,

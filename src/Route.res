@@ -1,18 +1,25 @@
-type re
+type t = string => option<{.}>
+
+type m = {
+  path: string,
+  params: {.},
+}
+
+@unboxed
+type isMatch =
+  | Match(option<m>)
+  | @as(false) False
+
+type match = string => isMatch
 
 @module("path-to-regexp")
-external pathToRegexp: string => re = "pathToRegexp"
+external match: string => match = "match"
 
-@send
-external exec: (re, string) => nullable<array<string>> = "exec"
-
-type t = string => option<array<string>>
-
-let make = s => {
-  let r = s->pathToRegexp
+let make = url => {
+  let fn = match(url)
   path =>
-    switch r->exec(path) {
-    | Value(t) => Some(t->Array.sliceToEnd(~start=1))
+    switch fn(path) {
+    | Match(t) => t->Option.map(t => t.params)
     | _ => None
     }
 }
