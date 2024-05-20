@@ -175,7 +175,7 @@ let router = (routes: array<route>) => (request: Request.t) => {
 
 let json = (t: 'a) =>
   Response.make({
-    body: t->JSON.stringifyAny->Option.getOr(""),
+    body: t->JSON.stringifyAny->Option.getExn,
     status: Ok,
     headers: [("Content-Type", "application/octet-stream")],
   })
