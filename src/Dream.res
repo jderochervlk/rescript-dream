@@ -177,7 +177,7 @@ let json = (t: 'a) =>
   Response.make({
     body: t->JSON.stringifyAny->Option.getExn,
     status: Ok,
-    headers: [("Content-Type", "application/octet-stream")],
+    headers: [("Content-Type", "application/json")],
   })
 
 let html = (e, ~status=Ok) => Response.make({body: e->Response.body, status})
