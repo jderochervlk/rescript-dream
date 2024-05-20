@@ -73,6 +73,8 @@ type status =
   | @as(510) NotExtended
   | @as(511) NetworkAuthenticationRequired
 
+external performance: unit => float = "performance.now"
+
 type header = (string, string)
 type headers = array<header>
 
@@ -159,21 +161,16 @@ let json = t => Response.make({json: t->toJson, status: Ok})
 
 let html = (e, ~status=Ok) => Response.make({body: e->Response.body, status})
 
-module Morgan = {
-  type logger = (Request.t, Response.t, unit => unit) => unit
-  @module("morgan")
-  external make: string => logger = "default"
+let logger: middleware = handler => {
+  async request => {
+    let start = performance()
+    let response = await handler(request)
+    let end = performance() -. start
+    Console.log(
+      `${(request.method :> string)} - ${request.url} - ${end->Float.toPrecisionWithPrecision(
+          ~digits=4,
+        )} ms`,
+    )
+    response
+  }
 }
-
-// let logger: string => middleware = string => {
-//   let log = Morgan.make(string)
-//   handler => {
-//     (request, ~params) => {
-//       let response = handler(request, ~params)
-//       response->Promise.then(res => {
-//         let _ = log(request, res, () => ()) // TODO: I am guessing this doesn't work since I am not using a real request object
-//         Promise.resolve(res)
-//       })
-//     }
-//   }
-// }

@@ -80,7 +80,15 @@ function html(e, statusOpt) {
         };
 }
 
-var Morgan = {};
+function logger(handler) {
+  return async function (request) {
+    var start = performance.now();
+    var response = await handler(request);
+    var end = performance.now() - start;
+    console.log(request.method + " - " + request.url + " - " + end.toPrecision(4) + " ms");
+    return response;
+  };
+}
 
 var t = "GET";
 
@@ -93,6 +101,6 @@ export {
   router ,
   json ,
   html ,
-  Morgan ,
+  logger ,
 }
 /* Route Not a pure module */
