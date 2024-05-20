@@ -1,4 +1,5 @@
 // https://aantron.github.io/dream/#methods
+@unboxed
 type method =
   | GET
   | POST
@@ -9,8 +10,8 @@ type method =
   | OPTIONS
   | TRACE
   | PATCH
-  | Method(string)
-// todo: method functions
+
+let t = GET
 
 type status =
   | @as(200) Ok
@@ -109,13 +110,15 @@ module Response = {
 }
 
 module Request = {
-  open Webapi.Fetch
-  type t = Request.t
-  let method = Request.method_
-  let url = Request.url
+  type t = {
+    method: method,
+    url: string,
+    /* params from the url, i.e. /path/:id becomes [ id ] */
+    urlParams: array<string>,
+  }
 }
 
-type handler = (Request.t, ~params: array<string>=?) => promise<Response.t>
+type handler = Request.t => promise<Response.t>
 
 type middleware = handler => handler
 
@@ -125,14 +128,12 @@ type route = Get(path, handler)
 
 let get = (path, handler) => Get(path->Route.make, handler)
 
-let router = (routes: array<route>) => (request: Request.t, ~params: option<array<string>>=?) => {
-  let requestMethod = request->Request.method
-  let requestPath = request->Request.url
-
-  let _ = params // just to hide the warning
+let router = (routes: array<route>) => (request: Request.t) => {
+  let requestMethod = request.method
+  let requestPath = request.url
 
   switch (requestMethod, requestPath) {
-  | (Get, requestPath) =>
+  | (GET, requestPath) =>
     switch routes->Array.find(route =>
       switch route {
       | Get(path, _) => path(requestPath)->Option.isSome
@@ -140,13 +141,12 @@ let router = (routes: array<route>) => (request: Request.t, ~params: option<arra
     ) {
     | Some(Get(path, handler)) => {
         let params = path(requestPath)->Option.getOr([])
-        handler(request, ~params)
+        handler({...request, urlParams: params})
       }
     | None => Promise.resolve(Response.make({status: NotFound}))
     }
   | _ => Promise.resolve(Response.make({status: NotFound}))
   }
-  // Promise.resolve(Response.make({status: NotFound}))
 }
 
 external toJson: {..} => JSON.t = "%identity"

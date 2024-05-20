@@ -2,7 +2,6 @@
 
 import * as Route from "./Route.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
-import * as Webapi__Fetch from "rescript-webapi/src/Webapi/Webapi__Fetch.res.mjs";
 
 function headersToObject(headers) {
   var obj = {};
@@ -22,16 +21,7 @@ var $$Response = {
   status: status
 };
 
-var method = Webapi__Fetch.$$Request.method_;
-
-function url(prim) {
-  return prim.url;
-}
-
-var $$Request = {
-  method: method,
-  url: url
-};
+var $$Request = {};
 
 function get(path, handler) {
   return {
@@ -42,15 +32,10 @@ function get(path, handler) {
 }
 
 function router(routes) {
-  return function (request, params) {
-    var requestMethod = method(request);
+  return function (request) {
+    var requestMethod = request.method;
     var requestPath = request.url;
-    if (typeof requestMethod === "object") {
-      return Promise.resolve({
-                  status: 404
-                });
-    }
-    if (requestMethod !== "Get") {
+    if (requestMethod !== "GET") {
       return Promise.resolve({
                   status: 404
                 });
@@ -63,8 +48,12 @@ function router(routes) {
                   status: 404
                 });
     }
-    var params$1 = Core__Option.getOr(match._0(requestPath), []);
-    return match._1(request, params$1);
+    var params = Core__Option.getOr(match._0(requestPath), []);
+    return match._1({
+                method: request.method,
+                url: request.url,
+                urlParams: params
+              });
   };
 }
 
@@ -85,7 +74,10 @@ function html(e, statusOpt) {
 
 var Morgan = {};
 
+var t = "GET";
+
 export {
+  t ,
   headersToObject ,
   $$Response ,
   $$Request ,

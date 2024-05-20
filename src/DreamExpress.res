@@ -1,3 +1,4 @@
+// TODO: make this a real function
 external transformRequest: Express.req => Dream.Request.t = "%identity"
 
 @send external append: (Express.res, string, string) => Express.res = "append"
@@ -10,7 +11,6 @@ let run = (~port=8080, handler: Dream.handler) => {
   app->Express.use((req, res, next) => {
     let _ = handler(req->transformRequest)->Promise.thenResolve(response => {
       let body = response.body
-      // let _ = Console.log2("--", req->Express.originalUrl)
       let _ =
         res
         ->Express.status(response->Dream.Response.status)

@@ -3,7 +3,7 @@
 import * as Dream from "../src/Dream.res.mjs";
 import * as DreamExpress from "../src/DreamExpress.res.mjs";
 
-DreamExpress.run(undefined, (async function (param, paramsOpt) {
+DreamExpress.run(undefined, (async function (param) {
         return Dream.html("Good morning!", undefined);
       }));
 

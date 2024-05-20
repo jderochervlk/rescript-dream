@@ -4,12 +4,11 @@ import * as Dream from "../src/Dream.res.mjs";
 import * as DreamExpress from "../src/DreamExpress.res.mjs";
 
 DreamExpress.run(undefined, Dream.router([
-          Dream.get("/", (async function (param, paramsOpt) {
+          Dream.get("/", (async function (param) {
                   return Dream.html("Good morning, world!", undefined);
                 })),
-          Dream.get("/echo/:word", (async function (param, paramsOpt) {
-                  var params = paramsOpt !== undefined ? paramsOpt : [];
-                  var name = params[0];
+          Dream.get("/echo/:word", (async function (param) {
+                  var name = param.urlParams[0];
                   return Dream.html(name, undefined);
                 }))
         ]));

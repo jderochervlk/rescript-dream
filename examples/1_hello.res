@@ -1,1 +1,1 @@
-let _ = DreamExpress.run(async (_, ~params=[]) => Dream.html("Good morning!"->Lite.string))
+let _ = DreamExpress.run(async _ => Dream.html("Good morning!"->Lite.string))
