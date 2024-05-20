@@ -4,4 +4,4 @@
 .bsb.lock
 .merlin
 
-.res.mjs
+*.res.mjs

@@ -161,6 +161,8 @@ let json = t => Response.make({json: t->toJson, status: Ok})
 
 let html = (e, ~status=Ok) => Response.make({body: e->Response.body, status})
 
+let sendStatus = status => Response.make({body: "", status})
+
 let logger: middleware = handler => {
   async request => {
     let start = performance()

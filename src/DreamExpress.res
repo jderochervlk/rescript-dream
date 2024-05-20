@@ -9,15 +9,22 @@ let run = (~port=8080, handler: Dream.handler) => {
   let app = Express.express()
 
   app->Express.use((req, res, next) => {
-    let _ = handler(req->transformRequest)->Promise.thenResolve(response => {
-      let body = response.body
-      let _ =
-        res
-        ->Express.status(response->Dream.Response.status)
-        ->Express.send(body)
-        ->setHeaders(response.headers->Dream.headersToObject)
-      next()
-    })
+    let _ =
+      handler(req->transformRequest)
+      ->Promise.thenResolve(response => {
+        let body = response.body
+        let _ =
+          res
+          ->Express.status(response->Dream.Response.status)
+          ->Express.send(body)
+          ->setHeaders(response.headers->Dream.headersToObject)
+        next()
+      })
+      ->Promise.catch(err => {
+        Console.error(err)
+        let _ = res->Express.sendStatus(500)
+        Promise.resolve()
+      })
   })
 
   app->Express.listenWithCallback(port, _ => {
