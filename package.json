@@ -1,6 +1,18 @@
 {
-  "name": "rescript-server",
-  "version": "0.0.0",
+  "name": "@jvlk/rescript-dream",
+  "version": "1.0.0",
+  "author": {
+    "name": "Josh Derocher-Vlk",
+    "email": "josh@vlkpack.com"
+  },
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/jderochervlk/rescript-dream"
+  },
+  "bugs": {
+    "url": "https://github.com/jderochervlk/rescript-dream/issues"
+  },
+  "license": "ISC",
   "type": "module",
   "scripts": {
     "res:build": "rescript",
@@ -8,10 +20,11 @@
     "res:dev": "rescript -w"
   },
   "keywords": [
-    "rescript"
+    "rescript",
+    "express",
+    "bun",
+    "server"
   ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "@jvlk/rescript-lite-jsx": "^1.1.0",
     "@rescript/core": "1.2.0",
