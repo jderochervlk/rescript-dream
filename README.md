@@ -40,5 +40,6 @@ let router = Dream.router([
   }),
 ])
 
+// You can also use DreamExpress.run
 let _ = DreamBun.run(router->Dream.logger)
 ```
