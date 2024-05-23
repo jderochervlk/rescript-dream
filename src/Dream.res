@@ -1,3 +1,31 @@
+module Route = {
+  type t = string => option<{.}>
+
+  type m = {
+    path: string,
+    params: {.},
+  }
+
+  @unboxed
+  type isMatch =
+    | Match(option<m>)
+    | @as(false) False
+
+  type match = string => isMatch
+
+  @module("path-to-regexp")
+  external match: string => match = "match"
+
+  let make = url => {
+    let fn = match(url)
+    path =>
+      switch fn(path) {
+      | Match(t) => t->Option.map(t => t.params)
+      | _ => None
+      }
+  }
+}
+
 // https://aantron.github.io/dream/#methods
 @unboxed
 type method =
@@ -10,8 +38,6 @@ type method =
   | OPTIONS
   | TRACE
   | PATCH
-
-let t = GET
 
 type status =
   | @as(200) Ok
@@ -74,30 +100,30 @@ type status =
   | @as(511) NetworkAuthenticationRequired
 
 external performance: unit => float = "performance.now"
+module Headers = {
+  type header = (string, string)
+  type t = array<header>
 
-type header = (string, string)
-type headers = array<header>
+  let toObject = (headers: option<t>) => {
+    let obj = Object.make()
+    switch headers {
+    | Some(headers) =>
+      headers->Array.forEach(((key, value)) => {
+        obj->Object.set(key, value)
+      })
+    | None => ignore()
+    }
 
-let headersToObject = (headers: option<headers>) => {
-  let obj = Object.make()
-  switch headers {
-  | Some(headers) =>
-    headers->Array.forEach(((key, value)) => {
-      obj->Object.set(key, value)
-    })
-  | None => ignore()
+    obj
   }
-
-  obj
 }
-
 module Response = {
   type body = string
 
   external body: 'a => body = "%identity"
 
   type t = {
-    headers?: headers,
+    headers?: Headers.t,
     status: status,
     url?: string,
     json?: JSON.t,
@@ -132,8 +158,6 @@ type middleware = handler => handler
 type path = Route.t
 
 type route = Route(path, method, handler)
-// | Get(path, handler)
-// | Post(path, handler)
 
 let get = (path, handler) => Route(path->Route.make, GET, handler)
 let post = (path, handler) => Route(path->Route.make, POST, handler)

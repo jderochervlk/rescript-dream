@@ -16,7 +16,7 @@ let run = (~port=8080, handler: Dream.handler) => {
         let _ =
           res
           ->Express.status(response->Dream.Response.status)
-          ->setHeaders(response.headers->Dream.headersToObject)
+          ->setHeaders(response.headers->Dream.Headers.toObject)
           ->Express.send(body)
 
         next()
