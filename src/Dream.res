@@ -1,15 +1,15 @@
 module Route = {
   type t = string => option<{.}>
 
-  type m = {
+  type pathMatch = {
     path: string,
     params: {.},
   }
 
   @unboxed
   type isMatch =
-    | Match(option<m>)
-    | @as(false) False
+    | Yes(option<pathMatch>)
+    | @as(false) No
 
   type match = string => isMatch
 
@@ -20,8 +20,8 @@ module Route = {
     let fn = match(url)
     path =>
       switch fn(path) {
-      | Match(t) => t->Option.map(t => t.params)
-      | _ => None
+      | Yes(t) => t->Option.map(t => t.params)
+      | No => None
       }
   }
 }

@@ -1,6 +1,6 @@
 module Route: {
   type t
-  type m
+  type pathMatch
   type isMatch
   type match
   @module("path-to-regexp")
